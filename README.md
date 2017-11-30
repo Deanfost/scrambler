@@ -11,8 +11,9 @@ extra
 - To account for special characters (., !, ?, etc.): if the last 1String
 is, and the Vowel insertion would either replace or go after the character,
 then abstain
+- If the last vowel replacement is capital, then downcase the insertion
 
-#### Examples:
+#### Examples
 - Kensington -> Kinsongtunu
 - Sponge -> Spungi
 - Empty -> Impta
@@ -20,5 +21,13 @@ then abstain
 - About -> Ebuata
 - Hello -> Hillu
 - He, -> Hi,
+
+### Drawbacks
+This algorithm assumes that you are giving it nothing but normal English words (except for acronyms/capitalized words). As a result, any strings with seemly randomly placed capital letters would return something slightly unexpected.
+
+Ex:
+- END -> INID
+- wOw -> wUwu
+
 ### Functions
 To use the algorithm, call the function (scramble-main String).
