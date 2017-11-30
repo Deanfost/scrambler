@@ -21,4 +21,4 @@ then abstain
 - Hello -> Hillu
 - He, -> Hi,
 ### Functions
-To scramble every other word in the input string, call (scramble-main). To scramble the entire string, call the function (scramble-string).
+To use the algorithm, call the function (scramble-main String).
