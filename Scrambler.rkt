@@ -14,9 +14,9 @@
 ; - If the last replacement is the last 1String in the list, then do nothing
 ; extra
 ; - Iff there is a 'Y' in the word, then replace it with 'A' (case-insensitive)
-; - To account for special characters (., !, ?, etc.): if the last 1String
-; is, and the Vowel insertion would either replace or go after the character,
-; then don't do it
+;   with that new 'A' becoming the next candidate as an insertion
+; - Note - The algorithm will only perform insertions if the entire current
+;   String is alphabetical
 
 ; Examples:
 ; - Kensington -> Kinsongtunu
@@ -192,25 +192,47 @@
 ; Given a [Listof Letter], Vowel, and index of that Vowel, return a String with
 ; the Vowel inserted 2 positions after the last Vowel replacement
 ; Note - if the last replacement is at the end, then do nothing
+;      - will not insert a vowel unless the String is completely alphabetical
+;      - unless the entire String is uppercase, it will insert a down-cased
+;        Vowel
 (check-expect (insert-vowel '() "e" 1) "") 
 (check-expect (insert-vowel (explode "Ebuat") "a" 4) "Ebuat")
 (check-expect (insert-vowel (explode "Ebuat") "a" 3) "Ebuata")
 (check-expect (insert-vowel (explode "Uar") "a" 1) "Uara")
-(check-expect (insert-vowel (explode "Innnt") "I" 0) "InInnt")
+(check-expect (insert-vowel (explode "Innnt") "I" 0) "Ininnt")
 (check-expect (insert-vowel (explode "Hillu") "u" 4) "Hillu")
 (check-expect (insert-vowel (explode "Hill") "i" 1) "Hilil")
 (check-expect (insert-vowel (explode "He,") "e" 1) "He,")
+(check-expect (insert-vowel (explode "HE") "E" 1) "HE")
+(check-expect (insert-vowel (explode "HEEKK") "E" 2) "HEEKEK")
+(check-expect (insert-vowel (explode "HEK") "E" 1) "HEKE")
 (define (insert-vowel l v i)
   (cond [(empty? l) ""]
-        [(< i (- (length l) 2))
-         (string-append (substring (implode l) 0 (+ 2 i)) v
-                        (substring (implode l) (+ 2 i)))]
-        [(= (- (length l) 2) i)
+        [else
          (cond [(string-alphabetic? (string-ith (implode l) (sub1 (length l))))
-                (string-append (implode l) v)]
-               [else
-                (implode l)])]
-        [else (implode l)]))
+                (cond [(< i (- (length l) 2))
+                       (cond [(string-upper-case? (implode l))
+                              (string-append (substring (implode l) 0 (+ 2 i)) v
+                                             (substring (implode l) (+ 2 i)))]
+                             [else
+                              (string-append (substring (implode l) 0 (+ 2 i))
+                                             (string-downcase v)
+                                             (substring (implode l) (+ 2 i)))])]
+                      [(= (- (length l) 2) i)
+                       (cond [(string-upper-case? (implode l))
+                              (string-append (implode l) v)]
+                             [else (string-append (implode l)
+                                                  (string-downcase v))])]
+                      [else (implode l)])]
+               [else (implode l)])]))
+
+; string-downcase : 1String -> 1String
+; Given a 1String, convert it to lower case
+(check-expect (string-downcase "H") "h")
+(check-expect (string-downcase "h") "h")
+(define (string-downcase s)
+  (int->string
+   (char->integer (char-downcase (integer->char (string->int s))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Predicates
