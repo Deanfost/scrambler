@@ -209,7 +209,7 @@
 (define (insert-vowel l v i)
   (cond [(empty? l) ""]
         [else
-         (cond [(string-alphabetic? (string-ith (implode l) (sub1 (length l))))
+         (cond [(string-alphabetic? (implode l))
                 (cond [(< i (- (length l) 2))
                        (cond [(string-upper-case? (implode l))
                               (string-append (substring (implode l) 0 (+ 2 i)) v
